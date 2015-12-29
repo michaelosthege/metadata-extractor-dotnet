@@ -69,6 +69,7 @@
     <Compile Include="Formats\Exif\Makernotes\OlympusImageProcessingMakernoteDirectory.cs" />
     <Compile Include="Formats\Exif\Makernotes\OlympusRawDevelopmentMakernoteDirectory.cs" />
     <Compile Include="Formats\Exif\Makernotes\OlympusEquipmentMakernoteDirectory.cs" />
+    <Compile Include="ExifTags.cs" />
     <Compile Include="Formats\Jfxx\JfxxDescriptor.cs" />
     <Compile Include="Formats\Jfxx\JfxxDirectory.cs" />
     <Compile Include="Formats\Jfxx\JfxxReader.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Formats\Raf\RafMetadataReader.cs" />
     <Compile Include="Formats\Xmp\Schema.cs" />
     <Compile Include="StringValue.cs" />
+    <Compile Include="NewApi.cs" />
     <Compile Include="Util\ByteConvert.cs" />
     <Compile Include="Util\DateUtil.cs" />
     <Compile Include="Util\FileType.cs" />
