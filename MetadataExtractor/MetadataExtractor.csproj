@@ -27,7 +27,7 @@
     <IncludeSource>true</IncludeSource>
     <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.1</Version>
+    <Version>2.0.3</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Signed)' == 'True' ">
