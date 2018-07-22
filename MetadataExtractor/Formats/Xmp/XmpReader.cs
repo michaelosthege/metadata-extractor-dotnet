@@ -22,6 +22,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,7 +59,7 @@ namespace MetadataExtractor.Formats.Xmp
         private static byte[] JpegSegmentPreambleBytes { get; } = Encoding.UTF8.GetBytes(JpegSegmentPreamble);
         private static byte[] JpegSegmentPreambleExtensionBytes { get; } = Encoding.UTF8.GetBytes(JpegSegmentPreambleExtension);
 
-        ICollection<JpegSegmentType> IJpegSegmentMetadataReader.SegmentTypes => new [] { JpegSegmentType.App1 };
+        ICollection<JpegSegmentType> IJpegSegmentMetadataReader.SegmentTypes => new[] { JpegSegmentType.App1 };
 
         public DirectoryList ReadJpegSegments(IEnumerable<JpegSegment> segments)
         {
@@ -106,7 +107,14 @@ namespace MetadataExtractor.Formats.Xmp
             var directory = new XmpDirectory();
             try
             {
-                var xmpMeta = XmpMetaFactory.ParseFromBuffer(xmpBytes, offset, length);
+                var bytes = new byte[length];
+                Array.Copy(xmpBytes, offset, bytes, 0, length);
+                directory.SetXmpRawData(bytes);
+
+                var xdoc = XmpMetaFactory.ExtractXDocumentFromBuffer(bytes);
+                directory.SetRootDocument(xdoc);
+
+                var xmpMeta = XmpMetaFactory.ParseFromXDocument(xdoc);
                 directory.SetXmpMeta(xmpMeta);
             }
             catch (XmpException e)

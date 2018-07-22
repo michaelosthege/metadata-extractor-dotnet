@@ -25,6 +25,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Xml.Linq;
 using JetBrains.Annotations;
 using XmpCore;
 
@@ -45,7 +46,6 @@ namespace MetadataExtractor.Formats.Xmp
     {
         public const int TagXmpValueCount = 0xFFFF;
 
-
         private static readonly Dictionary<int, string> _tagNameMap = new Dictionary<int, string>
         {
             { TagXmpValueCount, "XMP Value Count" }
@@ -55,6 +55,16 @@ namespace MetadataExtractor.Formats.Xmp
         /// <remarks>This object provides a rich API for working with XMP data.</remarks>
         [CanBeNull]
         public IXmpMeta XmpMeta { get; private set; }
+
+        /// <summary>Gets the raw data exposed by the Xmp element within this directory.</summary>
+        /// <remarks>Allows processing data from this element if the data is not standards-compliant.</remarks>
+        [CanBeNull]
+        public byte[] XmpRawData { get; private set; }
+
+        /// <summary>Root XMP <see cref="XDocument"/> as read from the file.</summary>
+        /// <remarks>Allows processing data from this element if the data is not standards-compliant.</remarks>
+        [CanBeNull]
+        public XDocument Root { get; private set; }
 
         public XmpDirectory()
         {
@@ -87,6 +97,16 @@ namespace MetadataExtractor.Formats.Xmp
             XmpMeta = xmpMeta;
 
             Set(TagXmpValueCount, XmpMeta.Properties.Count(prop => prop.Path != null));
+        }
+
+        public void SetXmpRawData([NotNull] byte[] data)
+        {
+            XmpRawData = data;
+        }
+
+        public void SetRootDocument([NotNull] XDocument root)
+        {
+            Root = root;
         }
     }
 }
