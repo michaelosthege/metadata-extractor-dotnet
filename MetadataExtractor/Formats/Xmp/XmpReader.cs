@@ -112,7 +112,7 @@ namespace MetadataExtractor.Formats.Xmp
                 directory.SetXmpRawData(bytes);
 
                 var xdoc = XmpMetaFactory.ExtractXDocumentFromBuffer(bytes);
-                directory.SetXmpRoot(xdoc);
+                directory.SetXmpMetaElement(xdoc.Root);
 
                 var xmpMeta = XmpMetaFactory.ParseFromXDocument(xdoc);
                 directory.SetXmpMeta(xmpMeta);

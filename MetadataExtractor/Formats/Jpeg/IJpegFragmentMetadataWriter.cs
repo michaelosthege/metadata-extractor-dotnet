@@ -49,6 +49,6 @@ namespace MetadataExtractor.Formats.Jpeg
         /// A directory containing metadata that shall be written to the JpegFragments.
         /// </param>
         [NotNull]
-        List<JpegFragment> UpdateFragments([NotNull] FragmentList fragments, [NotNull] object metadata);
+        List<JpegFragment> UpdateFragments([NotNull] FragmentList fragments, [NotNull] Directory metadata);
     }
 }

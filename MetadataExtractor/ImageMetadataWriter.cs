@@ -71,8 +71,11 @@ namespace MetadataExtractor
         /// <exception cref="ImageProcessingException">The file type is unknown, or processing errors occurred.</exception>
         /// <exception cref="System.IO.IOException"/>
         [NotNull]
-        public static MemoryStream WriteMetadata([NotNull] Stream stream, IEnumerable<object> metadata)
+        public static MemoryStream WriteMetadata([NotNull] Stream stream, IEnumerable<Directory> metadata)
         {
+            if (stream.Position != 0)
+                throw new System.ArgumentException("Stream not positioned at 0");
+
             var fileType = FileTypeDetector.DetectFileType(stream);
             switch (fileType)
             {

@@ -61,10 +61,10 @@ namespace MetadataExtractor.Formats.Xmp
         [CanBeNull]
         public byte[] XmpRawData { get; private set; }
 
-        /// <summary>Root XMP <see cref="XDocument"/> as read from the file.</summary>
+        /// <summary>Root XMP <see cref="XElement"/> as read from the file.</summary>
         /// <remarks>Allows processing data from this element if the data is not standards-compliant.</remarks>
         [CanBeNull]
-        public XDocument XmpRoot { get; private set; }
+        public XElement XmpMetaElement { get; private set; }
 
         public XmpDirectory()
         {
@@ -104,9 +104,11 @@ namespace MetadataExtractor.Formats.Xmp
             XmpRawData = data;
         }
 
-        public void SetXmpRoot([NotNull] XDocument root)
+        public void SetXmpMetaElement([NotNull] XElement root)
         {
-            XmpRoot = root;
+            if (root.Name.ToString() != "{adobe:ns:meta/}xmpmeta")
+                throw new System.ArgumentException("Incorrect XElement passed. Expected the x:xmpmeta element.");
+            XmpMetaElement = root;
         }
     }
 }

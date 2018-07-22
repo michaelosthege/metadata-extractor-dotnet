@@ -41,8 +41,8 @@ namespace MetadataExtractor.Tests.Formats.Xmp
         [Fact]
         public void TestEncodeXmpToPayloadBytes()
         {
-            XDocument xmp = XDocument.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp"));
-            byte[] payloadBytes = XmpWriter.EncodeXmpToPayloadBytes(xmp);
+            XElement xmpMetaElement = XElement.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp"));
+            byte[] payloadBytes = XmpWriter.EncodeXmpToPayloadBytes(xmpMetaElement);
             JpegSegment app1 = new JpegSegment(JpegSegmentType.App1, payloadBytes, offset: 0);
             JpegFragment frag = JpegFragment.FromJpegSegment(app1);
 
@@ -59,12 +59,14 @@ namespace MetadataExtractor.Tests.Formats.Xmp
             List<JpegFragment> originalFragments = null;
             using (var stream = TestDataUtil.OpenRead("Data/xmpWriting_PictureWithMicrosoftXmp.jpg"))
                 originalFragments = JpegFragmentWriter.SplitFragments(new SequentialStreamReader(stream));
-            XDocument xmp = XDocument.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp"));
+            XmpDirectory xmpDir = new XmpDirectory();
+            xmpDir.SetXmpMetaElement(XElement.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp")));
+
             byte[] originalApp1 = File.ReadAllBytes("Data/xmpWriting_MicrosoftXmp.app1");
             byte[] expectedApp1 = File.ReadAllBytes("Data/xmpWriting_MicrosoftXmpReencoded.app1");
 
             var writer = new XmpWriter();
-            var updatedFragments = writer.UpdateFragments(originalFragments, xmp);
+            var updatedFragments = writer.UpdateFragments(originalFragments, xmpDir);
 
             Assert.Equal(originalFragments.Count, updatedFragments.Count);
             // Check that only the App1 Xmp fragment is modified
@@ -93,12 +95,14 @@ namespace MetadataExtractor.Tests.Formats.Xmp
             List<JpegFragment> originalFragments = null;
             using (var stream = TestDataUtil.OpenRead("Data/xmpWriting_PictureWithoutXmp.jpg"))
                 originalFragments = JpegFragmentWriter.SplitFragments(new SequentialStreamReader(stream));
-            XDocument xmp = XDocument.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp"));
+            XmpDirectory xmpDir = new XmpDirectory();
+            xmpDir.SetXmpMetaElement(XElement.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp")));
+
             byte[] originalApp1 = File.ReadAllBytes("Data/xmpWriting_MicrosoftXmp.app1");
             byte[] expectedApp1 = File.ReadAllBytes("Data/xmpWriting_MicrosoftXmpReencoded.app1");
 
             var writer = new XmpWriter();
-            var updatedFragments = writer.UpdateFragments(originalFragments, xmp);
+            var updatedFragments = writer.UpdateFragments(originalFragments, xmpDir);
 
             Assert.True(updatedFragments.Count == originalFragments.Count + 1);
             // Check that only the App1 Xmp fragment is modified

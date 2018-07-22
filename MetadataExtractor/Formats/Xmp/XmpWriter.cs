@@ -31,18 +31,18 @@ namespace MetadataExtractor.Formats.Xmp
         /// </para>
         /// </summary>
         /// <param name="fragments">Original file fragmets</param>
-        /// <param name="metadata">The Xmp metadata that shall be written</param>
+        /// <param name="metadata">The Xmp metadata directory that shall be written</param>
         /// <returns>A new list of JpegFragments</returns>
-        public List<JpegFragment> UpdateFragments([NotNull] FragmentList fragments, [NotNull] object metadata)
+        public List<JpegFragment> UpdateFragments([NotNull] FragmentList fragments, [NotNull] Directory metadata)
         {
             JpegFragment metadataFragment;
             List<JpegFragment> output = new List<JpegFragment>();
             bool wroteData = false;
             int insertPosition = 0;
 
-            if (metadata is XDocument)
+            if (metadata is XmpDirectory)
             {
-                byte[] payloadBytes = EncodeXmpToPayloadBytes((XDocument)metadata);
+                byte[] payloadBytes = EncodeXmpToPayloadBytes((metadata as XmpDirectory).XmpMetaElement);
                 JpegSegment metadataSegment = new JpegSegment(JpegSegmentType.App1, payloadBytes, offset: 0);
                 metadataFragment = JpegFragment.FromJpegSegment(metadataSegment);
             }
@@ -100,10 +100,10 @@ namespace MetadataExtractor.Formats.Xmp
         /// <summary>
         /// Encodes an XDocument to bytes to be used as the payload of an App1 segment.
         /// </summary>
-        /// <param name="xmpDoc">Xmp document to be encoded</param>
+        /// <param name="xmpMetaElement">xmpmeta XElement to be encoded</param>
         /// <param name="writeable">Indicates if the Xmp packet shall be marked as writable.</param>
         /// <returns>App1 segment payload</returns>
-        public static byte[] EncodeXmpToPayloadBytes([NotNull] XDocument xmpDoc, bool writeable=true)
+        public static byte[] EncodeXmpToPayloadBytes([NotNull] XElement xmpMetaElement, bool writeable=true)
         {
             // constant parts
             byte[] preamble = Encoding.UTF8.GetBytes(XmpReader.JpegSegmentPreamble);
@@ -121,7 +121,7 @@ namespace MetadataExtractor.Formats.Xmp
             XmlWriterSettings settings = new XmlWriterSettings() { OmitXmlDeclaration = true };
             using (XmlWriter xmlWriter = XmlWriter.Create(xmpMS, settings))
             {
-                xmpDoc.WriteTo(xmlWriter);
+                xmpMetaElement.WriteTo(xmlWriter);
             }
 
             // 4. whitespace padding

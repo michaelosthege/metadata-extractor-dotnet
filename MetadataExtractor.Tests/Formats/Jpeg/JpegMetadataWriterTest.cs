@@ -28,6 +28,7 @@ using System.Linq;
 using System.Xml.Linq;
 using MetadataExtractor.Formats.Exif;
 using MetadataExtractor.Formats.Jpeg;
+using MetadataExtractor.Formats.Xmp;
 using MetadataExtractor.IO;
 using Xunit;
 
@@ -50,12 +51,12 @@ namespace MetadataExtractor.Tests.Formats.Jpeg
             List<JpegFragment> originalFragments = null;
             using (var stream = TestDataUtil.OpenRead("Data/xmpWriting_PictureWithMicrosoftXmp.jpg"))
                 originalFragments = JpegFragmentWriter.SplitFragments(new SequentialStreamReader(stream));
-            XDocument xmp = XDocument.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp"));
+            XmpDirectory xmpDir = new XmpDirectory();
+            xmpDir.SetXmpMetaElement(XElement.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp")));
             byte[] originalApp1 = File.ReadAllBytes("Data/xmpWriting_MicrosoftXmp.app1");
             byte[] expectedApp1 = File.ReadAllBytes("Data/xmpWriting_MicrosoftXmpReencoded.app1");
 
-            var metadata_objects = new object[] { xmp };
-            var updatedFragments = JpegMetadataWriter.UpdateJpegFragments(originalFragments, metadata_objects);
+            var updatedFragments = JpegMetadataWriter.UpdateJpegFragments(originalFragments, new Directory[] { xmpDir });
 
             Assert.Equal(originalFragments.Count, updatedFragments.Count);
             // Check that only the App1 Xmp fragment is modified
@@ -84,11 +85,12 @@ namespace MetadataExtractor.Tests.Formats.Jpeg
             List<JpegFragment> originalFragments = null;
             using (var stream = TestDataUtil.OpenRead("Data/xmpWriting_PictureWithMicrosoftXmp.jpg"))
                 originalFragments = JpegFragmentWriter.SplitFragments(new SequentialStreamReader(stream));
-            XDocument xmp = XDocument.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp"));
+            XmpDirectory xmpDir = new XmpDirectory();
+            xmpDir.SetXmpMetaElement(XElement.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp")));
 
             Assert.Throws<NotImplementedException>(delegate
             {
-                var metadata_objects = new object[] { xmp, "This is not a supported metadata object." };
+                var metadata_objects = new Directory[] { xmpDir, new ErrorDirectory("This is not a supported metadata object.") };
                 var updatedFragments = JpegMetadataWriter.UpdateJpegFragments(originalFragments, metadata_objects);
             });
         }
@@ -97,11 +99,11 @@ namespace MetadataExtractor.Tests.Formats.Jpeg
         public void TestWriteJpegMetadata()
         {
             var originalStream = TestDataUtil.OpenRead("Data/xmpWriting_PictureWithMicrosoftXmp.jpg");
-            XDocument xmp = XDocument.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp"));
+            XmpDirectory xmpDir = new XmpDirectory();
+            xmpDir.SetXmpMetaElement(XElement.Parse(File.ReadAllText("Data/xmpWriting_XmpContent.xmp")));
             byte[] expectedResult = TestDataUtil.GetBytes("Data/xmpWriting_PictureWithMicrosoftXmpReencoded.jpg");
 
-            var metadata_objects = new object[] { xmp };
-            var updatedStream = JpegMetadataWriter.WriteMetadata(originalStream, metadata_objects);
+            var updatedStream = JpegMetadataWriter.WriteMetadata(originalStream, new Directory[] { xmpDir });
 
             var actualResult = updatedStream.ToArray();
 

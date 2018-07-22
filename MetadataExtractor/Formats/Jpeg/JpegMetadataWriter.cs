@@ -55,7 +55,7 @@ namespace MetadataExtractor.Formats.Jpeg
         /// </summary>
         private static readonly Dictionary<Type, IJpegFragmentMetadataWriter> _allWriters = new Dictionary<Type, IJpegFragmentMetadataWriter>
         {
-            { typeof(XDocument), new XmpWriter() }
+            { typeof(XmpDirectory), new XmpWriter() }
         };
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace MetadataExtractor.Formats.Jpeg
         /// <param name="original">Stream of the original file.</param>
         /// <param name="metadata">Collection of metadata objects.</param>
         /// <returns>A new stream that contains Jpeg data, updated with the metadata.</returns>
-        public static MemoryStream WriteMetadata([NotNull] Stream original, [NotNull] IEnumerable<object> metadata)
+        public static MemoryStream WriteMetadata([NotNull] Stream original, [NotNull] IEnumerable<Directory> metadata)
         {
             var ssr = new SequentialStreamReader(original, isMotorolaByteOrder:true);
 
@@ -95,7 +95,7 @@ namespace MetadataExtractor.Formats.Jpeg
         /// <param name="metadata">Collection of metadata items.</param>
         /// <param name="writers">A dictionary that maps metadata types to compatible JpegMetadataWriters.</param>
         /// <returns>The updated list of JpegFragments</returns>
-        public static List<JpegFragment> UpdateJpegFragments([NotNull] List<JpegFragment> fragments, [NotNull] IEnumerable<object> metadata, [NotNull] Dictionary<Type, IJpegFragmentMetadataWriter> writers = null)
+        public static List<JpegFragment> UpdateJpegFragments([NotNull] List<JpegFragment> fragments, [NotNull] IEnumerable<Directory> metadata, [NotNull] Dictionary<Type, IJpegFragmentMetadataWriter> writers = null)
         {
             if (writers == null)
                 writers = _allWriters;

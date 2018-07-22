@@ -23,6 +23,8 @@
 #endregion
 
 using System;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace MetadataExtractor.Tests
 {
@@ -37,6 +39,32 @@ namespace MetadataExtractor.Tests
             var output = new byte[input.Length - countToSkip];
             Array.Copy(input, countToSkip, output, 0, input.Length - countToSkip);
             return output;
+        }
+
+        public static XElement NormalizeWithoutAnyOrder(XElement element)
+        {
+            if (element.HasElements)
+            {
+                return new XElement(
+                    element.Name,
+                    element.Attributes().OrderBy(a => a.Name.ToString()),
+                    element.Elements()
+                        .OrderBy(a => a.Name.ToString())
+                        .Select(e => NormalizeWithoutAnyOrder(e))
+                        .OrderBy(e => e.Attributes().Count())
+                        .OrderBy(e => string.Join("\u0001", e.Attributes().Select(a => a.Value)))
+                        .ThenBy(e => e.Value));
+            }
+            if (element.IsEmpty || string.IsNullOrEmpty(element.Value))
+            {
+                return new XElement(element.Name,
+                                     element.Attributes()
+                                            .OrderBy(a => a.Name.ToString()));
+            }
+            return new XElement(element.Name,
+                                 element.Attributes()
+                                        .OrderBy(a => a.Name.ToString()),
+                                 element.Value);
         }
     }
 }
