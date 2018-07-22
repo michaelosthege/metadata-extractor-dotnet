@@ -64,7 +64,7 @@ namespace MetadataExtractor.Formats.Xmp
         /// <summary>Root XMP <see cref="XDocument"/> as read from the file.</summary>
         /// <remarks>Allows processing data from this element if the data is not standards-compliant.</remarks>
         [CanBeNull]
-        public XDocument Root { get; private set; }
+        public XDocument XmpRoot { get; private set; }
 
         public XmpDirectory()
         {
@@ -104,9 +104,9 @@ namespace MetadataExtractor.Formats.Xmp
             XmpRawData = data;
         }
 
-        public void SetRootDocument([NotNull] XDocument root)
+        public void SetXmpRoot([NotNull] XDocument root)
         {
-            Root = root;
+            XmpRoot = root;
         }
     }
 }
