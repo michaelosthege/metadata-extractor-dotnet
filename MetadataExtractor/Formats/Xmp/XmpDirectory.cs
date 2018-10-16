@@ -106,8 +106,8 @@ namespace MetadataExtractor.Formats.Xmp
 
         public void SetXmpMetaElement([NotNull] XElement root)
         {
-            if (root.Name.ToString() != "{adobe:ns:meta/}xmpmeta")
-                throw new System.ArgumentException("Incorrect XElement passed. Expected the x:xmpmeta element.");
+            if (root.Name.ToString() != "{adobe:ns:meta/}xmpmeta" && root.Name.ToString() != "{adobe:ns:meta/}xapmeta")
+                throw new System.ArgumentException($"Incorrect XElement passed. Expected the x:x[a|m]pmeta element but got {root.Name}");
             XmpMetaElement = root;
         }
     }
